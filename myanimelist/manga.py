@@ -107,27 +107,33 @@ class Manga(media.Media):
                 # this published once.
                 try:
                     published_date = utilities.parse_profile_date(published_parts[0])
+                    published_dict = utilities.parse_airing_date_as_dict(published_parts[0])
                 except ValueError:
                     raise MalformedMangaPageError(self.id, published_parts[0],
                                                   message="Could not parse single publish date")
                 manga_info['published'] = (published_date,)
+                manga_info['published_dict'] = (published_dict,)
             else:
                 # two publishing dates.
                 try:
                     publish_start = utilities.parse_profile_date(published_parts[0])
+                    publish_dict_start = utilities.parse_airing_date_as_dict(published_parts[0])
                 except ValueError:
                     raise MalformedMangaPageError(self.id, published_parts[0],
                                                   message="Could not parse first of two publish dates")
                 if published_parts == '?':
                     # this is still publishing.
                     publish_end = None
+                    publish_dict_end = None
                 else:
                     try:
                         publish_end = utilities.parse_profile_date(published_parts[1])
+                        publish_dict_end = utilities.parse_airing_date_as_dict(published_parts[1])
                     except ValueError:
                         raise MalformedMangaPageError(self.id, published_parts[1],
                                                       message="Could not parse second of two publish dates")
                 manga_info['published'] = (publish_start, publish_end)
+                manga_info['published_dict'] = (publish_dict_start, publish_dict_end)
         except:
             if not self.session.suppress_parse_exceptions:
                 raise
