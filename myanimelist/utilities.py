@@ -203,4 +203,62 @@ def check_if_mal_response_is_empty(xmlel):
 
 def is_open_graph_style_stat_element(element):
     return element is not None and type(element) is HtmlElement and ((element.tail is not None and element.tail.strip() == "") or element.tail is None)
-    
+
+
+def parse_airing_date_as_dict(text, suppress=False):
+    """
+      Parses a MAL Aired date on an anime page and returns it as a dict.
+      The dict contains three keys: year, month, day.
+      If text is "Unknown" or "?" or "Not available" then returns None.
+      Otherwise, returns a dict object: return {'year': 2020, 'month': 12, 'day': 31}
+      If any part of the date is missing or unknown, then the corresponding part will be None in the dict.
+      With this dict we can have a more precise parsing, rather than a datetime.date object.
+      For example, MAL has the airing date as "2020". Parsed as datetime.date will return datetime.date(2020, 1, 1),
+      but parsed with this function will return {'year': 2020, 'month': None, 'day': None}.
+    """
+
+    try:
+        # MAL is inconsistent with the date format, sometimes has comma before the year, sometimes not.
+        # Removing extra comma and trimming whitespace.
+        t = text.replace(',', '').strip()
+
+        if t == 'Unknown' or t == '?' or t == 'Not available':
+            return None
+
+        airing_dict = {'year': None, 'month': None, 'day': None}
+
+        # Full date is known
+        try:
+            d = datetime.datetime.strptime(t, '%b %d %Y').date()
+            for key in airing_dict:
+                airing_dict[key] = d.__getattribute__(key)
+            return airing_dict
+        except ValueError:
+            pass
+
+        # Only the year and the month are known
+        try:
+            d = datetime.datetime.strptime(t, '%b %Y').date()
+            airing_dict['year'] = d.year
+            airing_dict['month'] = d.month
+            return airing_dict
+        except ValueError:
+            pass
+
+        # Only the year is known
+        try:
+            d = datetime.datetime.strptime(t, '%Y').date()
+            airing_dict['year'] = d.year
+            return airing_dict
+        except ValueError:
+            pass
+
+        # Returning the dict only if at least one part is known
+        for key in airing_dict:
+            if airing_dict[key] is not None:
+                return airing_dict
+        return None
+    except:
+        if suppress:
+            return None
+        raise
