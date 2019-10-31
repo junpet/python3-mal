@@ -47,6 +47,7 @@ class Anime(media.Media):
         super(Anime, self).__init__(session, anime_id)
         self._episodes = None
         self._aired = None
+        self._aired_dict = None
         self._producers = None
         self._licensors = None
         self._studios = None
@@ -443,6 +444,26 @@ class Anime(media.Media):
 
         """
         return self._aired
+
+    @property
+    @loadable('load')
+    def aired_dict(self):
+        """A tuple(2) containing up to two dicts({'year': 2020, 'month': 12, 'day': 31}) representing the start
+        and end dates of this anime's airing.
+        Some values of these dict can be None, but not all of them.
+        If none of the date parts are known, then it will be None instead of {'year': None, 'month': None, 'day': None}.
+
+          Potential configurations:
+
+            None -- Completely-unknown airing dates.
+
+            (dict, None) -- At least one date part of the anime start date is known, end date is unknown.
+
+            (dict, dict) -- At least one date part of the anime start and at least one date part of the end date are
+            known.
+
+        """
+        return self._aired_dict
 
     @property
     @loadable('load')
