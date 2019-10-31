@@ -45,6 +45,7 @@ class Manga(media.Media):
         self._volumes = None
         self._chapters = None
         self._published = None
+        self._published_dict = None
         self._authors = None
         self._serialization = None
 
@@ -201,6 +202,26 @@ class Manga(media.Media):
             (:class:`datetime.date`, :class:`datetime.date`) -- Manga start and end dates are known.
         """
         return self._published
+
+    @property
+    @loadable('load')
+    def published_dict(self):
+        """A tuple(2) containing up to two dicts({'year': 2020, 'month': 12, 'day': 31}) representing the start
+        and end dates of this manga's publishing.
+        Some values of these dict can be None, but not all of them.
+        If none of the date parts are known, then it will be None instead of {'year': None, 'month': None, 'day': None}.
+
+          Potential configurations:
+
+            None -- Completely-unknown airing dates.
+
+            (dict, None) -- At least one date part of the manga start date is known, end date is unknown.
+
+            (dict, dict) -- At least one date part of the manga start and at least one date part of the end date are
+            known.
+
+        """
+        return self._published_dict
 
     @property
     @loadable('load')
