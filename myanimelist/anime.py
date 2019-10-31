@@ -128,24 +128,33 @@ class Anime(media.Media):
                 try:
                     aired_date = utilities.parse_profile_date(aired_parts[0],
                                                               suppress=self.session.suppress_parse_exceptions)
+                    aired_dict = utilities.parse_airing_date_as_dict(aired_parts[0],
+                                                                     suppress=self.session.suppress_parse_exceptions)
                 except ValueError:
                     raise MalformedAnimePageError(self.id, aired_parts[0], message="Could not parse single air date")
                 anime_info['aired'] = (aired_date,)
+                anime_info['aired_dict'] = (aired_dict,)
             else:
                 # two airing dates.
                 try:
                     air_start = utilities.parse_profile_date(aired_parts[0],
                                                              suppress=self.session.suppress_parse_exceptions)
+                    air_dict_start = utilities.parse_airing_date_as_dict(aired_parts[0],
+                                                                         suppress=
+                                                                         self.session.suppress_parse_exceptions)
                 except ValueError:
                     raise MalformedAnimePageError(self.id, aired_parts[0],
                                                   message="Could not parse first of two air dates")
                 try:
                     air_end = utilities.parse_profile_date(aired_parts[1],
                                                            suppress=self.session.suppress_parse_exceptions)
+                    air_dict_end = utilities.parse_airing_date_as_dict(aired_parts[1],
+                                                                       suppress=self.session.suppress_parse_exceptions)
                 except ValueError:
                     raise MalformedAnimePageError(self.id, aired_parts[1],
                                                   message="Could not parse second of two air dates")
                 anime_info['aired'] = (air_start, air_end)
+                anime_info['aired_dict'] = (air_dict_start, air_dict_end)
         except:
             if not self.session.suppress_parse_exceptions:
                 raise
